@@ -1,42 +1,52 @@
 const cells = document.querySelectorAll('.cell');
 const message = document.getElementById('message');
-const score = document.getElementById('score');
-const round = document.getElementById('round');
+const playerScore = document.getElementById('player-score');
+const aiScore = document.getElementById('ai-score');
+const roundNumber = document.getElementById('round-number');
 const resetButton = document.getElementById('reset');
 
 let currentPlayer = 'X';
 let gameOver = false;
-let playerScore = 0;
-let aiScore = 0;
-let roundNumber = 1;
-
-const winPatterns = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-];
+let playerScoreValue = 0;
+let aiScoreValue = 0;
+let roundNumberValue = 0;
 
 resetButton.addEventListener('click', resetGame);
 
 function resetGame() {
     currentPlayer = 'X';
     gameOver = false;
-    roundNumber = 1;
+    roundNumberValue++;
     updateRound();
     message.textContent = 'Comece o jogo!';
     cells.forEach(cell => {
         cell.textContent = '';
         cell.style.backgroundColor = '#eee';
     });
+
+    if (roundNumberValue >= 3) {
+        roundNumberValue = 0;
+        playerScoreValue = 0;
+        aiScoreValue = 0;
+        updateScore();
+    }
 }
 
 function updateRound() {
-    round.textContent = `Rodada ${roundNumber}`;
+    roundNumber.textContent = `Rodada ${roundNumberValue + 1}`;
+}
+
+function updateScore() {
+    playerScore.textContent = playerScoreValue;
+    aiScore.textContent = aiScoreValue;
+
+    if (playerScoreValue >= 3) {
+        gameOver = true;
+        message.textContent = 'Jogador ganhou 3 partidas!';
+    } else if (aiScoreValue >= 3) {
+        gameOver = true;
+        message.textContent = 'A IA ganhou 3 partidas!';
+    }
 }
 
 function checkWin(player) {
@@ -71,9 +81,9 @@ function aiMove() {
             cell.textContent = 'O';
             if (checkWin('O')) {
                 gameOver = true;
-                aiScore++;
+                aiScoreValue++;
                 message.textContent = 'A IA venceu!';
-                score.textContent = `Pontuação: Jogador ${playerScore} - IA ${aiScore}`;
+                updateScore();
             } else if (checkTie()) {
                 gameOver = true;
                 message.textContent = 'Empate!';
@@ -91,9 +101,9 @@ cells.forEach(cell => {
             cell.textContent = currentPlayer;
             if (checkWin(currentPlayer)) {
                 gameOver = true;
-                playerScore++;
+                playerScoreValue++;
                 message.textContent = 'Jogador venceu!';
-                score.textContent = `Pontuação: Jogador ${playerScore} - IA ${aiScore}`;
+                updateScore();
             } else if (checkTie()) {
                 gameOver = true;
                 message.textContent = 'Empate!';
@@ -106,4 +116,13 @@ cells.forEach(cell => {
     });
 });
 
-resetGame();
+const winPatterns = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
